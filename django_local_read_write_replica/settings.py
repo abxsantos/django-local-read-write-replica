@@ -11,6 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "4z57zflmt-w81=r27)090wmve@js1af^%sktovelm46p7i^nw%"
 DEBUG = True
 
+ALLOWED_HOSTS = ["*"]
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     MyAppConfig.name,
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +59,7 @@ WSGI_APPLICATION = "django_local_read_write_replica.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE"),
-        "NAME": os.getenv("DB_DATABASE"),
+        "NAME": os.getenv("DB_NAME"),
         "USER": os.environ.get("DB_USER"),
         "HOST": os.environ.get("DB_HOST"),
         "PORT": os.environ.get("DB_PORT"),
@@ -65,8 +68,8 @@ DATABASES = {
 }
 if eval_env_as_bool(os.getenv("DB_USE_REPLICA")):
     DATABASES["replica"] = {
-        "ENGINE": os.getenv("DB_ENGINE_REPLICA"),
-        "NAME": os.getenv("DB_DATABASE_REPLICA"),
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "NAME": os.getenv("DB_NAME_REPLICA"),
         "USER": os.getenv("DB_USER_REPLICA"),
         "HOST": os.getenv("DB_HOST_REPLICA"),
         "PORT": os.getenv("DB_PORT_REPLICA"),
@@ -119,4 +122,14 @@ LOGGING = {
             "handlers": ["console"],
         },
     },
+}
+
+Q_CLUSTER = {
+    "name": "myscheduler",
+    "orm": "replica",  # Use Django's ORM + database for broker
+    "save_limit": int(os.getenv("Q_CLUSTER_SAVE_LIMIT", 0)),  # -1 to not save success tasks
+    "max_attempts": int(os.getenv("Q_CLUSTER_MAX_ATTEMPTS", 5)),  # Attempts before failing
+    "retry": int(os.getenv("Q_CLUSTER_RETRY", 15)),  # Seconds a broker will wait for a cluster to finish a task
+    "timeout": int(os.getenv("Q_CLUSTER_TIMEOUT", 10)),  # Seconds a worker spend on a task before it’s terminated
+    "poll": int(os.getenv("Q_CLUSTER_POOL", 0.2)),  # Seconds which django Q will make a query to verify the time
 }

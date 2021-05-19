@@ -1,5 +1,7 @@
 import logging
 
+from django_q.models import Schedule
+
 logger = logging.getLogger(__name__)
 
 
@@ -8,6 +10,10 @@ class DatabaseRouter:
     A router to control all database operations on models in the
     auth application.
     """
+    @staticmethod
+    def is_djangoq_schedule(model):
+        logger.debug(f"name of model is {model.__name__} and instance of {isinstance(model, Schedule)}")
+        return isinstance(model, Schedule)
 
     def db_for_read(self, model, **hints):
         """

@@ -3,11 +3,11 @@ FROM python:3.9-slim-buster
 WORKDIR /app
 
 # Copies necessary stuff to install dependencies
-COPY poetry.lock pyproject.toml /app/
+COPY pyproject.toml /app/
 
 # Installs Poetry
 RUN pip install --upgrade pip && \
-    pip install poetry
+    pip install poetry  && poetry config virtualenvs.create false --local
 
 # Creates requirements.txt, removes poetry and installs projects dependencies as a separate layer
 RUN poetry export -f requirements.txt -o requirements.txt && \

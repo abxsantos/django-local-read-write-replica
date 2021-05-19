@@ -2,3 +2,7 @@
 tox/
 .pytest_cache/
 .coverage
+.idea
+.vscode
+.tox
+.pytest_cache
